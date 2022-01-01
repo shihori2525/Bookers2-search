@@ -8,6 +8,32 @@ class User < ApplicationRecord
   has_many :favorites,dependent: :destroy
   has_many :book_comments,dependent: :destroy
 
+  has_many :relationships, foreign_key: :follower_id,dependent: :destroy
+  has_many :followers, through: :relationships, source: :followed
+
+  has_many :reverse_of_relationships,class_name: "Relationship",foreign_key: :followed_id,dependent: :destroy
+  has_many :followed, through: :reverse_of_relationships,source: :follower
+
+  def is_followed_by?(user)
+    reverse_of_relationships.find_by(follower_id: user.id).present?
+  end
+
+  def follow(other_user)
+   unless self == other_user
+    self.relationships.find_or_create_by(follow_id: other_user.id)
+   end
+  end
+
+  def unfollow(other_user)
+   relationship = self.relationships.find_by(follow_id: other_user.id)
+   relationship.destroy if relationship
+  end
+
+  def following?(other_user)
+   self.followings.include?(other_user)
+  end
+
+
   attachment :profile_image, destroy: false
 
   def favorited_by?(book)
