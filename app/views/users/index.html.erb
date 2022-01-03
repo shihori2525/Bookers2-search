@@ -8,8 +8,9 @@
       </div>
 
     <div class='col-md-8 offset-md-1'>
+      <%= render 'searches/form'%>
       <h2>Users</h2>
-      <%= render 'index',users: @users %>
+      <%= render 'index',users: @users ,user: @user%>
     </div>
   </div>
 </div>
